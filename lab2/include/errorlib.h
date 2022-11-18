@@ -5,5 +5,5 @@
 #include <string.h>
 #include <unistd.h>
 
-int oerror(const char * error, int id);
+int Oerror(const char * error, int id);
 #endif

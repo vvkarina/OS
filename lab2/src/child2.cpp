@@ -9,7 +9,7 @@ int main() {
             c = '_';
         }
         if(write(1, &c, 1) == -1) {
-            oerror("can't write the pipe 2 by child2", -1);
+            Oerror("can't write the pipe 2 by child2", -1);
         }
     }
     return 0;

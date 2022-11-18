@@ -13,13 +13,10 @@ target_link_libraries(GTest::GTest INTERFACE gtest_main)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# LAB 2 tests
-add_executable(test_lab2 test_lab2.cpp  ../lab2/include/errorlib.cpp ../lab2/src/parent.cpp ../lab2/include/parent.h)
+add_executable(lab2_test test_lab2.cpp ../lab2/src/parent.cpp ../lab2/include/parent.h
+        ../lab2/src/errorlib.cpp ../lab2/include/errorlib.h)
 
+target_link_libraries(lab2_test PRIVATE GTest::GTest)
+target_include_directories(lab2_test PRIVATE ../lab2/include)
 
-target_link_libraries(test_lab2 PRIVATE GTest::GTest)
-#target_link_libraries(test_lab2 errorlib)
-target_include_directories(test_lab2 PRIVATE ../lab2/include)
-
-add_test(test_lab2 test_lab2)
-
+add_test(lab2_test lab2_test)

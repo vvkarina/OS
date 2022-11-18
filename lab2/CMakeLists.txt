@@ -1,19 +1,18 @@
 set(CMAKE_C_STANDARD 11)
 
-include_directories(include)
-
 add_executable(lab2 
 		main.cpp
-		src/parent.cpp)
-                
-add_executable(child1 src/child1.cpp)
-add_executable(child2 src/child2.cpp)
+		src/parent.cpp
+		src/errorlib.cpp)
+		
+target_include_directories(lab2 PRIVATE include)
 
-add_subdirectory(include)
+add_executable(child1 
+		src/child1.cpp 
+		src/errorlib.cpp)
+target_include_directories(child1 PRIVATE include)
+add_executable(child2 src/child2.cpp src/errorlib.cpp)
+target_include_directories(child2 PRIVATE include)
 
-target_link_libraries(lab2 errorlib)
-target_link_libraries(child1 errorlib)
-target_link_libraries(child2 errorlib)
+add_dependencies(lab2 child1 child2)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/1.txt  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/2.txt  DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

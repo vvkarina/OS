@@ -1,5 +1,4 @@
 #include "parent.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -9,7 +8,7 @@ int main(void) {
 
     std::string s;
     while (getline(std::cin, s)) {
-        input.push_back(s);
+        input.push_back(std::move(s));
     }
     std::vector <std::string> output = ParentRoutine(input);
 
