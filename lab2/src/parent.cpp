@@ -10,131 +10,96 @@
 #include <fstream>
 #include <sys/wait.h>
 
-std::vector<std::string> ParentRoutine (const std::vector<std::string> &input){
-
+std::vector<std::string> ParentRoutine(const std::vector<std::string> &input)
+{
+    const char endLine = '\n';
+    char readChar;
+    std::string str;
     std::vector<std::string> output;
-
-
-
-    int fd1[2], fd2[2], fd3[2];
-    if (pipe(fd1) == -1)
+    int fd1[2], fd2[2], fd3[2], errc;
+    if (pipe(fd1) == -1 ||
+        pipe(fd2) == -1 ||
+        pipe(fd3) == -1)
     {
-        Oerror("can't create a pipe fd1:", -1);
-    }
-    if (pipe(fd2) == -1)
-    {
-        Oerror("can't create a pipe fd2:", -2);
-    }
-    if (pipe(fd3) == -1)
-    {
-        Oerror("can't create a pipe fd3:", -3);
+        Oerror("can't create a pipe\n",-1);
     }
     int pid1, pid2;
-    if((pid1 = fork()) == 0) {
-        if (dup2(fd1[0], STDIN_FILENO) == -1)
+    if ((pid1 = fork()) == 0)
+    {
+        if (dup2(fd1[0], STDIN_FILENO) == -1 ||
+            dup2(fd3[1], STDOUT_FILENO) == -1 ||
+            close(fd1[1]) == -1 ||
+            close(fd3[0]) == -1 ||
+            close(fd2[1]) == -1 ||
+            close(fd2[0]))
         {
-           Oerror("can't duplicate descriptor pipe 1:", -1);
+            Oerror("Error init a pipe\n",-1);
         }
-        if (dup2(fd3[1], STDOUT_FILENO) == -1)
+
+        if (execlp("./child1", "child1", NULL) == -1)
         {
-            Oerror("can't duplicate descriptor pipe 2:", -2);
-        }
-        if (close(fd1[1]) == -1)
-        {
-            Oerror("can't close pipe 1 write", -3);
-            Oerror("can't close pipe 1 write", 1);
-        }
-        if (close(fd3[0]) == -1)
-        {
-            Oerror("can't close pipe 3 read:", -4);
-        }
-        if (close(fd2[1]) == -1)
-        {
-            Oerror("can't close pipe 3 read:", -5);
-        }
-        if (close(fd2[0]) == -1)
-        {
-           Oerror("can't close pipe 3 read:", -6);
-        }
-        if(execlp("./child1", "child1", NULL) == -1) {
-            Oerror("can't open file child1:", -7);
+            Oerror("can't open file child1:\n",-1);
         }
     }
-    if(pid1 > 0 && (pid2 = fork()) == 0) {
-        if (dup2(fd2[1], STDOUT_FILENO) == -1)
+    if (pid1 > 0 && (pid2 = fork()) == 0)
+    {
+        if (dup2(fd2[1], STDOUT_FILENO) == -1 ||
+            dup2(fd3[0], STDIN_FILENO) == -1 ||
+            close(fd2[0]) == -1 ||
+            close(fd3[1]) == -1 ||
+            close(fd1[1]) == -1 ||
+            close(fd1[0]) == -1)
         {
-            Oerror("can't duplicate descriptor pipe 2:", -1);
+            Oerror("Error init a pipe\n",-1);
         }
-        if (dup2(fd3[0], STDIN_FILENO) == -1)
+        if (execlp("./child2", "child2", NULL) == -1)
         {
-           Oerror("can't duplicate descriptor pipe 3:", -2);
-        }
-        if (close(fd2[0]) == -1)
-        {
-            Oerror("can't close pipe 2 read", -3);
-        }
-        if (close(fd3[1]) == -1)
-        {
-            Oerror("can't close pipe 3 write:", -4);
-        }
-        if (close(fd1[1]) == -1)
-        {
-            Oerror("can't close pipe 3 read:", -5);
-        }
-        if (close(fd1[0])== -1)
-        {
-            Oerror("can't close pipe 3 read:", -6);
-        }
-        if(execlp("./child2", "child2", NULL) == -1) {
-            Oerror("can't open file child2:", -7);
+            Oerror("can't open file child2:\n",-1);
         }
     }
-    if(pid1 == -1 || pid2 == -1) {
-        fprintf(stderr, "Can't create a child process");
-        exit(-1);
+    if (pid1 == -1 || pid2 == -1)
+    {
+        Oerror("can't create processes child:\n",-1);
     }
-    if(pid1 == -1) {
-        Oerror("can't create process child1:", -4);
-    }
-    if(pid2 == -1) {
-        Oerror("can't create process child2:", -5);
-    }
-    if(pid1 != 0 && pid2 != 0) {
-        char c;
-        if(close(fd1[0]) == -1) {
-            Oerror("can't close pipe 1 read:", -6);
+    if (pid1 != 0 && pid2 != 0)
+    {
+        if (close(fd1[0]) == -1 ||
+            close(fd2[1]) == -1)
+        {
+            Oerror("can't close pipe read:\n",-1);
         }
-        if(close(fd2[1]) == -1) {
-            Oerror("can't close pipe 1 read:", -7);
-        }
-        std::string res;
-        for (const std::string & s : input) {
-           std::string s_tmp = s+ '\n';
-          int jj;
-          jj=s_tmp.size();
-           for (int i = 0; i <jj; ++i) 
+        for (const auto &s : input)
+        {
+            if (write(fd1[1], s.c_str(), s.size()) == -1)
             {
-            c=s_tmp[i];
-            if(write(fd1[1], &c, 1) == -1) {
-                Oerror("can't write in pipe 1:", -9);
+                Oerror("can't write in pipe 1:\n",-1);
             }
-            if(read(fd2[0], &c, 1) == -1) {
-                Oerror("can't read from pipe 2:", -10);
+            if (write(fd1[1], &endLine, 1) == -1)
+            {
+                Oerror("can't write in pipe 1:\n",-1);
+            }
+            str.clear();
+            while ((errc = read(fd2[0], &readChar, 1)))
+            {
+                if (errc == -1)
+                {
+                    Oerror("can't read from pipe 2:\n",-1);
+                }
+                if (readChar == '\n')
+                {
+                    break;
+                }
+
+                str += readChar;
             }
 
-            if(c == '\n') {
-                output.push_back(res);
-                res.clear();
-            } else {
-                res += c;
-            }
-            }
-       }
+            output.push_back(std::move(str));
+        }
         close(fd1[1]);
         close(fd2[0]);
         close(fd3[1]);
         close(fd3[0]);
-        waitpid(-1, NULL, 0);
+        wait(NULL);
     }
     return output;
 }
