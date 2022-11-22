@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #include <iostream>
 #include"errorlib.h"
+
 int main() {
     char c;
     while(read(0, &c, 1) > 0) {
