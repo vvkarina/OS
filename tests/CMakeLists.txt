@@ -20,3 +20,10 @@ target_link_libraries(lab2_test PRIVATE GTest::GTest)
 target_include_directories(lab2_test PRIVATE ../lab2/include)
 
 add_test(lab2_test lab2_test)
+
+add_executable(lab3_test lab3_test.cpp ../lab3/include/lab3.h ../lab3/src/lab3.cpp ../lab3/include/utils.h)
+
+target_link_libraries(lab3_test PRIVATE GTest::GTest)
+target_include_directories(lab3_test PRIVATE ../lab3/include)
+
+add_test(lab3_test lab3_test)
