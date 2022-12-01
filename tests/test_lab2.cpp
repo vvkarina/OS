@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-//#include <gmock/gmock.h>
+#include <gmock/gmock.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "parent.h"
