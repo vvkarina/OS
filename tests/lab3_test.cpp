@@ -7,11 +7,11 @@
 
 namespace
 {
-    TVector GenerateMatrix(unsigned int m)
+    TVector GenerateMatrix(int m)
     {
         TVector result1(m);
         std::srand(std::time(nullptr));
-        for (unsigned int i = 0; i < m; ++i)
+        for (int i = 0; i < m; ++i)
         {
             result1[i] = std::rand() % 100 + 1;
         }
@@ -28,11 +28,11 @@ TEST(ThirdLabTests, SingleThreadYieldsCorrectResults)
 
 TEST(ThirdLabTest, ThreadConfigurations)
 {
-    auto performTestForGivenSize = [](unsigned int m, unsigned int maxThreadCount)
+    auto performTestForGivenSize = [](int m, int maxThreadCount)
     {
         auto m1 = GenerateMatrix(m);
         auto result = MinVector(m1, 1);
-        for (unsigned int i = 2; i < maxThreadCount; ++i)
+        for (int i = 2; i < maxThreadCount; ++i)
         {
             EXPECT_EQ(MinVector(m1, i), result);
         }
@@ -45,7 +45,7 @@ TEST(ThirdLabTest, ThreadConfigurations)
 
 TEST(ThirdLabTest, PerfomanceTest)
 {
-    auto getAvgTime = [](unsigned int threadCount)
+    auto getAvgTime = [](int threadCount)
     {
         auto m1 = GenerateMatrix(400000000);
         constexpr int runsCount = 1;
