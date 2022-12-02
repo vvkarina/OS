@@ -5,11 +5,11 @@
 
 namespace
 {
-    void MinVectoRows(const TVector &lhs, TVector &result, unsigned int firstRow, unsigned int lastRow, unsigned int iterator)
+    void MinVectoRows(const TVector &lhs, TVector &result, int firstRow, int lastRow, int iterator)
     {
-        unsigned int min1;
+        int min1;
         min1 = lhs[firstRow];
-        for (unsigned int j = firstRow; j < lastRow; ++j)
+        for (int j = firstRow; j < lastRow; ++j)
         {
             if (min1 > lhs[j])
             {
@@ -20,23 +20,21 @@ namespace
     }
 }
 
-int MinVector(const TVector &lhs, unsigned int threadCount)
+int MinVector(const TVector &lhs, int threadCount)
 {
-    unsigned int min;
-    unsigned int sizev;
-    sizev = lhs.size();
-    unsigned int actualThreads = std::min(threadCount, sizev);
+    int min;
+    int actualThreads = std::min(threadCount, isize(lhs));
     TVector result(actualThreads);
     if (threadCount > 1)
     {
-        unsigned int iterator = 0;
+        int iterator = 0;
         std::vector<std::thread> threads;
-        unsigned int rowsPerThread = sizev / actualThreads;
-        for (unsigned int i = 0; i < sizev; i += rowsPerThread)
+        int rowsPerThread = isize(lhs) / actualThreads;
+        for (int i = 0; i < isize(lhs); i += rowsPerThread)
         {
-            if (i + rowsPerThread >= result.size())
+            if (i + rowsPerThread >= isize(result))
             {
-                threads.emplace_back(MinVectoRows, std::ref(lhs), std::ref(result), i, sizev, iterator);
+                threads.emplace_back(MinVectoRows, std::ref(lhs), std::ref(result), i, isize(lhs), iterator);
             }
             else
             {
@@ -51,11 +49,10 @@ int MinVector(const TVector &lhs, unsigned int threadCount)
     }
     else
     {
-        MinVectoRows(lhs, result, 0, sizev, 0);
+        MinVectoRows(lhs, result, 0, isize(lhs), 0);
     }
     min = result[0];
-    unsigned int end = result.size();
-    for (unsigned int j = 0; j < end; ++j)
+    for (int j = 0; j < isize(result); ++j)
     {
         if (min > result[j])
         {

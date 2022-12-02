@@ -2,7 +2,7 @@
 #define OS_LABS_LAB3_H
 #include <vector>
 
-using TVector = std::vector<unsigned int>;
-int MinVector(const TVector &lhs, unsigned int threadCount);
+using TVector = std::vector<int>;
+int MinVector(const TVector &lhs, int threadCount);
 
 #endif // OS_LABS_LAB3_H

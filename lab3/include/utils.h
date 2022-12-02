@@ -6,9 +6,9 @@
 #define OS_LABS_UTILS_H
 
 template <typename Container>
-inline unsigned int isize(const Container &c)
+inline int isize(const Container &c)
 {
-    return static_cast<unsigned int>(c.size());
+    return static_cast<int>(c.size());
 }
 
 #endif // OS_LABS_UTILS_H

@@ -3,8 +3,8 @@
 #include <iostream>
 
 int main() {
-    unsigned int  m; 
-    unsigned int threadCount;
+    int  m; 
+    int threadCount;
     std::cin >> m >> threadCount;
     if (threadCount==0)
     {
@@ -12,7 +12,7 @@ int main() {
     }
     TVector lhs(m);
     auto readVector = [m](TVector& matrix) {
-          for(unsigned int i = 0; i < m; ++i) {
+          for(int i = 0; i < m; ++i) {
                   std::cin >> matrix[i];
           }
    };
