@@ -40,14 +40,13 @@ TEST(ThirdLabTest, ThreadConfigurations)
     performTestForGivenSize(3, 3);
     performTestForGivenSize(100, 2);
     performTestForGivenSize(1000, 3);
-    performTestForGivenSize(100000000, 4);
 }
 
 TEST(ThirdLabTest, PerfomanceTest)
 {
     auto getAvgTime = [](int threadCount)
     {
-        auto m1 = GenerateMatrix(400000000);
+        auto m1 = GenerateMatrix(40000000);
         constexpr int runsCount = 1;
         double avg = 0;
         for (int i = 0; i < runsCount; ++i)
