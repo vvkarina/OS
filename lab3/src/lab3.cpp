@@ -1,11 +1,13 @@
 #include "lab3.h"
 #include "utils.h"
-#include <thread>
+#include <pthread.h>
 #include <iostream>
+
+pthread_mutex_t mutex;
 
 namespace
 {
-    void MinVectoRows(const TVector &lhs, TVector &result, int firstRow, int lastRow, int iterator)
+    void MinVectorRows(const TVector &lhs, TVector &result, int firstRow, int lastRow, int iterator)
     {
         int min1;
         min1 = lhs[firstRow];
@@ -16,40 +18,63 @@ namespace
                 min1 = lhs[j];
             }
         }
+        pthread_mutex_lock(&mutex);
         result[iterator] = min1;
+        pthread_mutex_unlock(&mutex);
     }
+}
+
+void *MinVectorRowsRoutine(void *arg)
+{
+    auto *token = (TThreadToken *)arg;
+    MinVectorRows(*token->lhs, *token->result, token->firstRow, token->lastRow, token->iterator);
+    return nullptr;
 }
 
 int MinVector(const TVector &lhs, int threadCount)
 {
     int min;
+    pthread_mutex_init(&mutex, nullptr);
     int actualThreads = std::min(threadCount, isize(lhs));
     TVector result(actualThreads);
     if (threadCount > 1)
     {
         int iterator = 0;
-        std::vector<std::thread> threads;
         int rowsPerThread = isize(lhs) / actualThreads;
+        std::vector<pthread_t> threads(actualThreads);
+        std::vector<TThreadToken> tokens(actualThreads);
+
         for (int i = 0; i < isize(lhs); i += rowsPerThread)
         {
             if (i + rowsPerThread >= isize(result))
             {
-                threads.emplace_back(MinVectoRows, std::ref(lhs), std::ref(result), i, isize(lhs), iterator);
+                tokens[iterator].lhs = &lhs;
+                tokens[iterator].result = &result;
+                tokens[iterator].firstRow = i;
+                tokens[iterator].lastRow = isize(lhs);
+                tokens[iterator].iterator = iterator;
+                pthread_create(&threads[iterator], nullptr, &MinVectorRowsRoutine, &tokens[iterator]);
             }
             else
             {
-                threads.emplace_back(MinVectoRows, std::ref(lhs), std::ref(result), i, i + rowsPerThread - 1, iterator);
+                tokens[iterator].lhs = &lhs;
+                tokens[iterator].result = &result;
+                tokens[iterator].firstRow = i;
+                tokens[iterator].lastRow = (i + rowsPerThread - 1);
+                tokens[iterator].iterator = iterator;
+                pthread_create(&threads[iterator], nullptr, &MinVectorRowsRoutine, &tokens[iterator]);
             }
             ++iterator;
         }
-        for (auto &thread : threads)
+        for (int i = 0; i < actualThreads; i++)
         {
-            thread.join();
+            pthread_join(threads[i], nullptr);
         }
+        pthread_mutex_destroy(&mutex);
     }
     else
     {
-        MinVectoRows(lhs, result, 0, isize(lhs), 0);
+        MinVectorRows(lhs, result, 0, isize(lhs), 0);
     }
     min = result[0];
     for (int j = 0; j < isize(result); ++j)
