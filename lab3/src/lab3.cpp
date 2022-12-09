@@ -3,8 +3,6 @@
 #include <pthread.h>
 #include <iostream>
 
-pthread_mutex_t mutex;
-
 namespace
 {
     void MinVectorRows(const TVector &lhs, TVector &result, int firstRow, int lastRow, int iterator)
@@ -18,9 +16,7 @@ namespace
                 min1 = lhs[j];
             }
         }
-        pthread_mutex_lock(&mutex);
         result[iterator] = min1;
-        pthread_mutex_unlock(&mutex);
     }
 }
 
@@ -34,7 +30,6 @@ void *MinVectorRowsRoutine(void *arg)
 int MinVector(const TVector &lhs, int threadCount)
 {
     int min;
-    pthread_mutex_init(&mutex, nullptr);
     int actualThreads = std::min(threadCount, isize(lhs));
     TVector result(actualThreads);
     if (threadCount > 1)
@@ -46,22 +41,18 @@ int MinVector(const TVector &lhs, int threadCount)
 
         for (int i = 0; i < isize(lhs); i += rowsPerThread)
         {
+            tokens[iterator].lhs = &lhs;
+            tokens[iterator].result = &result;
+            tokens[iterator].firstRow = i;
+            tokens[iterator].iterator = iterator;
             if (i + rowsPerThread >= isize(result))
             {
-                tokens[iterator].lhs = &lhs;
-                tokens[iterator].result = &result;
-                tokens[iterator].firstRow = i;
                 tokens[iterator].lastRow = isize(lhs);
-                tokens[iterator].iterator = iterator;
                 pthread_create(&threads[iterator], nullptr, &MinVectorRowsRoutine, &tokens[iterator]);
             }
             else
             {
-                tokens[iterator].lhs = &lhs;
-                tokens[iterator].result = &result;
-                tokens[iterator].firstRow = i;
                 tokens[iterator].lastRow = (i + rowsPerThread - 1);
-                tokens[iterator].iterator = iterator;
                 pthread_create(&threads[iterator], nullptr, &MinVectorRowsRoutine, &tokens[iterator]);
             }
             ++iterator;
@@ -70,7 +61,6 @@ int MinVector(const TVector &lhs, int threadCount)
         {
             pthread_join(threads[i], nullptr);
         }
-        pthread_mutex_destroy(&mutex);
     }
     else
     {
