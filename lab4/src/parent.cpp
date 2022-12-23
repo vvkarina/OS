@@ -1,27 +1,18 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/wait.h>
-#include <string.h>
-#include "parent.h"
-#include "errorlib.h"
 #include <vector>
-#include <iostream>
-#include <fstream>
 #include <sys/wait.h>
-
 #include <fcntl.h>
 #include <semaphore.h>
 #include <sys/signal.h>
 #include <sys/mman.h>
-#include <unistd.h>
-#include <signal.h>
-#include <fstream>
-#include <memory>
-sem_t *sem1, *sem2, *sem3, *sem4;
+#include "parent.h"
+#include "errorlib.h"
 
 std::vector<std::string> ParentRoutine(const std::vector<std::string> &input)
 {
+    sem_t *sem1, *sem2, *sem3, *sem4;
     char readChar;
     std::string str;
     std::vector<std::string> output;
