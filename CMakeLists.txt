@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(OS_LABS C CXX)
-set(CMAKE_C_STANDARD 11)
 
 enable_testing()
 
@@ -11,5 +10,11 @@ else()
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
+include(FindThreads)
+
+
 add_subdirectory(lab2)
+add_subdirectory(lab3)
+add_subdirectory(lab4)
+add_subdirectory(lab5)
 add_subdirectory(tests)
