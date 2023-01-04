@@ -35,3 +35,4 @@ target_link_libraries(lab5_test PRIVATE GTest::GTest)
 target_include_directories(lab5_test PRIVATE ../lab5/include)
 
 add_test(lab5_test lab5_test)
+
