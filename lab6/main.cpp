@@ -46,12 +46,14 @@ int main()
     auto time_heartbeat = 0;
 
     print_menu();
+     
+    
     while (true)
     {
         std::cin >> cmd;
         if (cmd == "create")
         {
-            std::cin >> input_id;
+           std::cin >> input_id;
             if (child_pid == 0)
             {
                 child_pid = fork();
@@ -98,6 +100,7 @@ int main()
             std::cin >> input_id;
             if (input_id == child_id)
             {
+                //tree.erase(input_id);
                 kill(child_pid, SIGTERM);
                 kill(child_pid, SIGKILL);
                 child_id = 0;
@@ -126,10 +129,11 @@ int main()
             }
             path.erase(path.begin());
             msg = "exec " + subcmd + " " + std::to_string(path.size());
-            for (int i = 0; i < input_id; ++i)
-            {
-                msg += " " + std::to_string(path[i]);
-            }
+//            for (int i = 0; i < input_id; ++i)
+             for (int i = 0; i < int(path.size()); ++i)
+             {
+                 msg += " " + std::to_string(path[i]);
+             }
             send_msg(main_socket, msg);
             result = recieve_msg(main_socket);
             std::cout << result << std::endl;

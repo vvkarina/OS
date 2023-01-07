@@ -80,6 +80,10 @@ class BinTree {
             Node* prev = nullptr;
             Node* tmp = this->head;
             while(tmp != nullptr){
+//                while(tmp->id < 1000 || tmp->id > 0){
+//                while(int (tmp->id) < 1000){
+ //               while((tmp) != 0){    
+ //              std::cout << tmp->id << std::endl;
                 if (id == tmp->id) {
                     if (prev == nullptr) {
                         this->head = nullptr;
@@ -91,6 +95,7 @@ class BinTree {
                         }
                     }
                     delete_recursive(tmp);
+                    tmp=nullptr;
                 } else if(id < tmp->id) {
                     prev = tmp;
                     tmp = tmp->left;
@@ -99,7 +104,10 @@ class BinTree {
                     tmp = tmp->right;
                 }
             }
+
         }
+
+
 
     private:
 
@@ -126,9 +134,12 @@ class BinTree {
         void delete_recursive(Node* node){
             if(node == nullptr)
                 return;
+            //delete_recursive(node->left);
             delete_recursive(node->right);
             delete_recursive(node->left);
             delete node;
+            node=nullptr;
+
         }
 
         friend class TestBitTree;
